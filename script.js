@@ -28,6 +28,7 @@ const GM_META = [
   { key:'smp',     label:'SMP',     img:'smp.png'       },
   { key:'axe',     label:'Axe',     img:'axe.png'       },
   { key:'mace',    label:'Mace',    img:'Mace.png'      },
+  { key:'spear',   label:'Spear',   img:'Netherite_Spear.png' },
 ];
 
 const TAB_META = [
@@ -40,6 +41,7 @@ const TAB_META = [
   { key:'smp',     label:'SMP',     img:'smp.png'       },
   { key:'axe',     label:'Axe',     img:'axe.png'       },
   { key:'mace',    label:'Mace',    img:'Mace.png'      },
+  { key:'spear',   label:'Spear',   img:'Netherite_Spear.png' },
 ];
 
 const ALL_TIER_OPTS = ['','HT1','HT2','HT3','HT4','HT5','LT1','LT2','LT3','LT4','LT5'];

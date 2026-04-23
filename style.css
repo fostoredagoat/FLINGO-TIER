@@ -314,9 +314,13 @@ main { padding-top: var(--nav-h); position: relative; z-index: 1; min-height: 10
 
 /* ── TABS ────────────────────────────────────────────────────────────────── */
 .tabs-wrap {
-  display: flex; gap: .5rem; flex-wrap: wrap;
+  display: flex; gap: .5rem; flex-wrap: nowrap;
   margin-bottom: 1.4rem;
+  overflow-x: auto; overflow-y: hidden;
+  scrollbar-width: none; -ms-overflow-style: none;
+  padding-bottom: 2px;
 }
+.tabs-wrap::-webkit-scrollbar { display: none; }
 .tab {
   font-family: var(--font-b); font-weight: 700; font-size: .88rem; letter-spacing: .5px;
   padding: .7rem 1.2rem .65rem;
