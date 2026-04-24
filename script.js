@@ -149,8 +149,8 @@ function openPopup(player, allPlayers) {
         <img class="popup-v2-avatar" src="${getHeadSkin(player)}" alt="${escHtml(player.name)}" loading="lazy"
           onerror="this.onerror=null;this.src='https://mc-heads.net/avatar/Steve/100'"/>
       </div>
-      <div class="popup-v2-name">${escHtml(player.name)}</div>
-      ${player.title ? `<div class="popup-v2-title-badge">
+      <div class="popup-v2-name" ${player.nameColor ? `style="color:${escHtml(player.nameColor)}"` : ''}>${escHtml(player.name)}</div>
+      ${player.title ? `<div class="popup-v2-title-badge" ${player.badgeColor ? `style="background:${escHtml(player.badgeColor)}22;border-color:${escHtml(player.badgeColor)}55;color:${escHtml(player.badgeColor)}"` : ''}>
         <svg class="popup-v2-title-icon" viewBox="0 0 24 24" fill="currentColor"><path d="M12 2L9.19 8.63L2 9.24L7 13.47L5.82 20.16L12 16.56L18.18 20.16L17 13.47L22 9.24L14.81 8.63L12 2Z"/></svg>
         ${escHtml(player.title)}</div>` : ''}
       <div class="popup-v2-position-block">
@@ -183,7 +183,7 @@ function buildRow(player, rank, activeTab, allPlayers) {
   div.className = `prow${rankCls}${glint}`;
   div.style.animationDelay = `${Math.min((rank-1)*.04,.7)}s`;
   const titleHtml = player.title
-    ? `<div class="row-title-line"><div class="row-title-icon"></div><span class="row-title">${escHtml(player.title)} (${pts} pts)</span></div>`
+    ? `<div class="row-title-line"><div class="row-title-icon"></div><span class="row-title" ${player.badgeColor ? `style="color:${escHtml(player.badgeColor)}"` : ''}>${escHtml(player.title)} (${pts} pts)</span></div>`
     : `<div class="row-title-line"><div class="row-title-icon"></div><span class="row-title">${pts} pts</span></div>`;
   div.innerHTML = `
     <div class="row-rank-block">
@@ -197,7 +197,7 @@ function buildRow(player, rank, activeTab, allPlayers) {
     </div>
     <div class="row-main">
       <div class="row-info">
-        <div class="row-name" title="${escHtml(player.name)}">${escHtml(player.name)}</div>
+        <div class="row-name" title="${escHtml(player.name)}" ${player.nameColor ? `style="color:${escHtml(player.nameColor)}"` : ''}>${escHtml(player.name)}</div>
         ${titleHtml}
       </div>
       <div class="row-badges">${buildBadges(player.tiers||{}, activeTab)}</div>
@@ -326,6 +326,24 @@ function openEditModal(player) {
       </div>
       <div class="fg"><label class="fl">Custom Skin URL (optional)</label><input class="fi" id="e-skin" value="${escHtml(player.customSkin||'')}" placeholder="https://..."/></div>
       <div class="fg"><label class="fl">Title (optional)</label><input class="fi" id="e-title" value="${escHtml(player.title||'')}" placeholder="e.g. Combat Master"/></div>
+      <div class="color-row">
+        <div class="fg" style="flex:1">
+          <label class="fl">Username Color</label>
+          <div class="color-pick-wrap">
+            <input type="color" class="color-swatch" id="e-nameColor" value="${escHtml(player.nameColor||'#efefef')}"/>
+            <input class="fi color-hex" id="e-nameColorHex" value="${escHtml(player.nameColor||'#efefef')}" placeholder="#efefef" maxlength="7"/>
+            <button class="color-reset-btn" id="e-nameColorReset" title="Reset to default">↺</button>
+          </div>
+        </div>
+        <div class="fg" style="flex:1">
+          <label class="fl">Badge Color</label>
+          <div class="color-pick-wrap">
+            <input type="color" class="color-swatch" id="e-badgeColor" value="${escHtml(player.badgeColor||'#ff2d55')}"/>
+            <input class="fi color-hex" id="e-badgeColorHex" value="${escHtml(player.badgeColor||'#ff2d55')}" placeholder="#ff2d55" maxlength="7"/>
+            <button class="color-reset-btn" id="e-badgeColorReset" title="Reset to default">↺</button>
+          </div>
+        </div>
+      </div>
       <div class="gm-section-lbl">Gamemode Tiers</div>
       <div class="gm-grid">${gmHtml}</div>
       <button class="btn btn-primary w100" id="e-save">Save Changes</button>
@@ -339,6 +357,17 @@ function openEditModal(player) {
   }
   document.getElementById('e-skin').addEventListener('input', syncPrev);
   document.getElementById('e-name').addEventListener('input', syncPrev);
+  // Color pickers sync
+  function syncColorPair(swatchId, hexId) {
+    const swatch = document.getElementById(swatchId);
+    const hex    = document.getElementById(hexId);
+    swatch.addEventListener('input', () => { hex.value = swatch.value; });
+    hex.addEventListener('input', () => { if(/^#[0-9a-fA-F]{6}$/.test(hex.value)) swatch.value = hex.value; });
+  }
+  syncColorPair('e-nameColor','e-nameColorHex');
+  syncColorPair('e-badgeColor','e-badgeColorHex');
+  document.getElementById('e-nameColorReset').addEventListener('click', () => { document.getElementById('e-nameColor').value='#efefef'; document.getElementById('e-nameColorHex').value='#efefef'; });
+  document.getElementById('e-badgeColorReset').addEventListener('click', () => { document.getElementById('e-badgeColor').value='#ff2d55'; document.getElementById('e-badgeColorHex').value='#ff2d55'; });
   document.getElementById('edit-close').addEventListener('click', () => ov.classList.remove('open'));
   ov.addEventListener('click', e => { if(e.target===ov) ov.classList.remove('open'); });
   document.getElementById('e-save').addEventListener('click', async () => {
@@ -347,6 +376,8 @@ function openEditModal(player) {
       name:       document.getElementById('e-name').value.trim() || player.name,
       customSkin: document.getElementById('e-skin').value.trim(),
       title:      document.getElementById('e-title').value.trim(),
+      nameColor:  document.getElementById('e-nameColorHex').value.trim() || '',
+      badgeColor: document.getElementById('e-badgeColorHex').value.trim() || '',
       tiers: {},
     };
     GM_META.forEach(g => { updated.tiers[g.key] = document.getElementById(`e-${g.key}`).value; });
@@ -395,6 +426,24 @@ function mountAdminPanel() {
             </div>
           </div>
           <div class="fg"><label class="fl">Custom Title (optional)</label><input class="fi" id="f-title" placeholder="e.g. Combat Master"/></div>
+          <div class="color-row">
+            <div class="fg" style="flex:1">
+              <label class="fl">Username Color</label>
+              <div class="color-pick-wrap">
+                <input type="color" class="color-swatch" id="f-nameColor" value="#efefef"/>
+                <input class="fi color-hex" id="f-nameColorHex" value="#efefef" placeholder="#efefef" maxlength="7"/>
+                <button class="color-reset-btn" id="f-nameColorReset" title="Reset">↺</button>
+              </div>
+            </div>
+            <div class="fg" style="flex:1">
+              <label class="fl">Badge Color</label>
+              <div class="color-pick-wrap">
+                <input type="color" class="color-swatch" id="f-badgeColor" value="#ff2d55"/>
+                <input class="fi color-hex" id="f-badgeColorHex" value="#ff2d55" placeholder="#ff2d55" maxlength="7"/>
+                <button class="color-reset-btn" id="f-badgeColorReset" title="Reset">↺</button>
+              </div>
+            </div>
+          </div>
           <div class="gm-section-lbl">Gamemode Tiers</div>
           <div class="gm-grid">${gmHtml}</div>
           <button class="btn btn-primary w100" id="f-add">Add Player</button>
@@ -433,6 +482,17 @@ function mountAdminPanel() {
     reader.onload = e => { uploadedDataUrl = e.target.result; updatePreview(); };
     reader.readAsDataURL(file);
   });
+  // Color picker sync for add form
+  function syncFColorPair(swatchId, hexId) {
+    const swatch = document.getElementById(swatchId);
+    const hex    = document.getElementById(hexId);
+    swatch.addEventListener('input', () => { hex.value = swatch.value; });
+    hex.addEventListener('input', () => { if(/^#[0-9a-fA-F]{6}$/.test(hex.value)) swatch.value = hex.value; });
+  }
+  syncFColorPair('f-nameColor','f-nameColorHex');
+  syncFColorPair('f-badgeColor','f-badgeColorHex');
+  document.getElementById('f-nameColorReset').addEventListener('click', () => { document.getElementById('f-nameColor').value='#efefef'; document.getElementById('f-nameColorHex').value='#efefef'; });
+  document.getElementById('f-badgeColorReset').addEventListener('click', () => { document.getElementById('f-badgeColor').value='#ff2d55'; document.getElementById('f-badgeColorHex').value='#ff2d55'; });
   document.getElementById('f-add').addEventListener('click', async () => {
     const name = nameEl.value.trim();
     const msg  = document.getElementById('f-msg');
@@ -443,13 +503,15 @@ function mountAdminPanel() {
     }
     const tiers = {};
     GM_META.forEach(g => { tiers[g.key] = document.getElementById(`f-${g.key}`).value; });
-    const player = { name, customSkin: uploadedDataUrl || urlEl.value.trim(), title: document.getElementById('f-title').value.trim(), tiers };
+    const player = { name, customSkin: uploadedDataUrl || urlEl.value.trim(), title: document.getElementById('f-title').value.trim(), nameColor: document.getElementById('f-nameColorHex').value.trim() || '', badgeColor: document.getElementById('f-badgeColorHex').value.trim() || '', tiers };
     try {
       await fbAddPlayer(player);
       msg.textContent = `${name} added!`;
       msg.className = 'form-msg ok'; msg.style.display = 'block';
       nameEl.value = ''; urlEl.value = ''; fileEl.value = '';
       document.getElementById('f-title').value = '';
+      document.getElementById('f-nameColor').value = '#efefef'; document.getElementById('f-nameColorHex').value = '#efefef';
+      document.getElementById('f-badgeColor').value = '#ff2d55'; document.getElementById('f-badgeColorHex').value = '#ff2d55';
       GM_META.forEach(g => { document.getElementById(`f-${g.key}`).value = ''; });
       uploadedDataUrl = ''; prevImg.style.opacity = '.3'; prevImg.src = ''; statusEl.textContent = '';
       setTimeout(() => { msg.style.display = 'none'; }, 3000);

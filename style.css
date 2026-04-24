@@ -834,6 +834,35 @@ body.admin-mode .admin-wrap { display: block; }
 .admin-card-title em { color: var(--red); font-style: normal; }
 .admin-card-body { padding: 1.4rem; }
 
+/* ── COLOR PICKER ROW ───────────────────────────────────────────────────── */
+.color-row {
+  display: flex; gap: .8rem; margin-bottom: .78rem;
+}
+.color-pick-wrap {
+  display: flex; align-items: center; gap: .4rem;
+}
+.color-swatch {
+  width: 36px; height: 36px; border-radius: 7px;
+  border: 1px solid var(--border); background: var(--g2);
+  cursor: pointer; padding: 2px; flex-shrink: 0;
+  -webkit-appearance: none; appearance: none;
+}
+.color-swatch::-webkit-color-swatch-wrapper { padding: 0; border-radius: 5px; }
+.color-swatch::-webkit-color-swatch { border: none; border-radius: 5px; }
+.color-hex {
+  flex: 1; min-width: 0;
+  font-family: var(--font-h) !important;
+  font-size: .72rem !important; letter-spacing: 1px;
+}
+.color-reset-btn {
+  background: var(--g3); border: 1px solid var(--border); color: var(--soft);
+  font-size: .95rem; width: 30px; height: 30px; border-radius: 6px;
+  cursor: pointer; flex-shrink: 0; display: flex; align-items: center; justify-content: center;
+  transition: color .14s, border-color .14s;
+}
+.color-reset-btn:hover { color: var(--red); border-color: var(--red-b); }
+@media (max-width: 480px) { .color-row { flex-direction: column; } }
+
 /* ── FOOTER ─────────────────────────────────────────────────────────────── */
 footer {
   background: var(--g1); border-top: 1px solid var(--border);
